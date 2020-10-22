@@ -5,6 +5,9 @@ import {
 
 // Internal dependencies
 import './motion-effects';
+import {
+	getContentAreaSelector,
+} from 'gutenberg/utils/selectors';
 
 // Check whether current page is inside (visual) builder or not
 var isBuilder = 'object' === typeof window.ET_Builder;
@@ -1173,7 +1176,7 @@ const _post_id  = et_pb_custom.page_id;
 				et_is_ipad = navigator.userAgent.match( /iPad/ ),
 				et_is_ie9 = navigator.userAgent.match( /MSIE 9.0/ ) !== null,
 				et_all_rows = $('.et_pb_row'),
-				$et_container = window.et_pb_custom && ! window.et_pb_custom.is_builder_plugin_used ? $( '.container' ) : et_all_rows,
+				$et_container = window.et_pb_custom && ! window.et_pb_custom.is_builder_plugin_used ? $( 'body' ) : et_all_rows,
 				et_container_width = $et_container.width(),
 				et_is_vertical_fixed_nav = $( 'body' ).hasClass( 'et_vertical_fixed' ),
 				et_is_rtl = $( 'body' ).hasClass( 'rtl' ),
@@ -3071,7 +3074,7 @@ const _post_id  = et_pb_custom.page_id;
 
 				if (isBlockLayoutPreview) {
 					// Important: in gutenberg, scroll doesn't happen on window; it's here instead
-					$parallaxWindow  = top_window.jQuery('.edit-post-layout__content');
+					$parallaxWindow = top_window.jQuery(getContentAreaSelector(top_window, true));
 
 					// Background offset is relative to block's preview iframe
 					backgroundOffset = top_window.jQuery('#divi-layout-iframe-' + ETBlockLayoutModulesScript.blockId).offset().top;
@@ -3702,7 +3705,7 @@ const _post_id  = et_pb_custom.page_id;
 						}
 
 						// mark the slides without content
-						if ( 0 === Math.abs( parseInt( $(this).find( '.et_pb_slide_description' ).height() ) ) ) {
+						if ( 0 === $(this).find( '.et_pb_slide_description' ).length || 0 === $(this).find( '.et_pb_slide_description' ).html().trim().length ) {
 							$(this).find( '.et_pb_container' ).addClass( 'et_pb_empty_slide' );
 						}
 
@@ -3823,6 +3826,7 @@ const _post_id  = et_pb_custom.page_id;
 				var provider              = $newsletter_container.find('input[name="et_pb_signup_provider"]').val();
 				var account               = $newsletter_container.find('input[name="et_pb_signup_account_name"]').val();
 				var ip_address            = $newsletter_container.find('input[name="et_pb_signup_ip_address"]').val();
+				var post_id               = $newsletter_container.find('input[name="et_pb_signup_post_id"]').val();
 
 				var $fields_container = $newsletter_container.find('.et_pb_newsletter_fields');
 
@@ -4120,7 +4124,7 @@ const _post_id  = et_pb_custom.page_id;
 							et_custom_fields: custom_fields,
 							et_hidden_fields: hidden_fields,
 							token: token,
-							et_post_id: _post_id,
+							et_post_id: post_id,
 						},
 						beforeSend: function() {
 							$newsletter_container
@@ -4439,6 +4443,10 @@ const _post_id  = et_pb_custom.page_id;
 					'opacity'                   : starting_opacity,
 					'animation-timing-function' : animation_speed_curve
 				});
+
+				if (animation_style === 'slideTop' || animation_style === 'slideBottom') {
+					$element.css('left', 0);
+				}
 
 				var intensity_css        = {};
 				var intensity_percentage = isNaN( parseInt( animation_intensity ) ) ? 50 : parseInt( animation_intensity );
@@ -4879,11 +4887,12 @@ const _post_id  = et_pb_custom.page_id;
 
 				$element.removeClass( animation_classes.join(' ') );
 				$element.css({
-					'animation-delay'           : '',
-					'animation-duration'        : '',
-					'animation-timing-function' : '',
-					'opacity'                   : '',
-					'transform'                 : '',
+					'animation-delay':           '',
+					'animation-duration':        '',
+					'animation-timing-function': '',
+					'opacity':                   '',
+					'transform':                 '',
+					'left':                      '',
 				});
 
 				// Prevent animation module with no explicit position property to be incorrectly positioned
@@ -5850,7 +5859,7 @@ const _post_id  = et_pb_custom.page_id;
 					// so we need to add src data:image on the list. And also, need to
 					// ignore if current iframe has .lazyloading class because it's not
 					// visible until it's lazy loaded.
-					if (!isUndefined(window.lazySizes) && !isUndefined(window.lazySizesConfig)) {
+					if (!isUndefined(window.lazySizes)) {
 						customSelector += ", iframe[src^='data:image']";
 						ignore += '.lazyloading';
 					}
@@ -6944,7 +6953,7 @@ const _post_id  = et_pb_custom.page_id;
 
 		// The visible iframe is still being processed by lazysizes at the first
 		// load, so we need to check those iframes and reload fitVids.
-		if (!isUndefined(window.lazySizes) && !isUndefined(window.lazySizesConfig)) {
+		if (!isUndefined(window.lazySizes)) {
 			$(document).on('lazyloaded', function(e){
 				const $target = $(e.target);
 				if ($target.is('iframe') && isUndefined($target.attr('name'))) {

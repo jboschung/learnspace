@@ -21,8 +21,9 @@ import { fromObject } from '@frontend-builder/features/scroll-effects/entities/s
 import ETBuilderOffsetsConst from '@frontend-builder/constants/et-builder-offsets-const';
 import { Window } from '@frontend-builder/features/scroll-effects/stores/window';
 import { top_window } from '@core/admin/js/frame-helpers';
+import { getContentAreaSelector } from 'gutenberg/utils/selectors';
 
-const isBlockEditor = $(top_window.document).find('.edit-post-layout__content').length > 0;
+const isBlockEditor = $(top_window.document).find(getContentAreaSelector(top_window, true)).length > 0;
 const isBuilder     = isObject(window.ET_Builder) && size(window.ET_Builder) > 1 && !isBlockEditor;
 
 const getViewportWidth     = () => jQuery(window).width();
@@ -40,7 +41,7 @@ const getMotionElementsFE = () => {
     return allMotionElements;
   }
 
-  /** 
+  /**
    * We're inside the Builder, but still need to render motion effects from the TB
    * Get all the motion elements for TB parts of the layout
    */
@@ -133,7 +134,7 @@ const updateItems = (elements, device) => {
         scrollEffects.remove(id);
       }
     });
-  
+
   if (!motionEffectsLoaded) {
     motionEffectsLoaded = true;
     setTimeout(() => toggleMotionElements('show'), 200);

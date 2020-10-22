@@ -240,7 +240,10 @@ import { top_window } from '@core/admin/js/frame-helpers';
                         pagination = $module.find('.et_pb_portofolio_pagination');
                     }
                     if (0 === pagination.length || (pagination.length > 0 && !pagination.is(':visible'))) {
-                        $first_in_last_row.addClass('on_last_row');
+                        if (columns_count > 1) {
+                            $first_in_last_row.addClass('on_last_row');
+                        }
+
                         $first_in_last_row.nextAll().addClass('on_last_row');
                     }
                 }
